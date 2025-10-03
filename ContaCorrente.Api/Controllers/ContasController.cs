@@ -1,5 +1,6 @@
 ﻿using ContaCorrente.Api.Application.Commands.CreateContaCorrente;
 using ContaCorrente.Api.Application.Commands.InativarConta;
+using ContaCorrente.Api.Application.Commands.Movimentacao;
 using ContaCorrente.Api.Application.DTOs;
 using ContaCorrente.Api.Application.Exceptions;
 using ContaCorrente.Api.Application.Queries.Login;
@@ -102,6 +103,41 @@ namespace ContaCorrente.Api.Controllers
             await _mediator.Send(command);
 
             return NoContent();
+        }
+
+        [HttpPost("movimentacao")]
+        [Authorize] // Este endpoint requer um token de autenticação
+        public async Task<IActionResult> Movimentacao([FromBody] MovimentacaoRequestDto request)
+        {
+            try
+            {
+                var idContaCorrente = User.FindFirstValue("idcontacorrente");
+                if (string.IsNullOrEmpty(idContaCorrente))
+                {
+                    return Unauthorized();
+                }
+
+                var command = new MovimentacaoCommand
+                {
+                    IdRequisicao = request.IdRequisicao,
+                    IdContaCorrente = idContaCorrente, // Usa o ID do token
+                    Valor = request.Valor,
+                    TipoMovimento = request.TipoMovimento
+                };
+
+                await _mediator.Send(command);
+
+                return NoContent(); // Retorna HTTP 204 em caso de sucesso
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                var errorResponse = new ErrorResponse
+                {
+                    Mensagem = ex.Message,
+                    TipoFalha = ex.FailureType
+                };
+                return BadRequest(errorResponse); // Retorna HTTP 400 para violações de regras de negócio
+            }
         }
     }
 }
