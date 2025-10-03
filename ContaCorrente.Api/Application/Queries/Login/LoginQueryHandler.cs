@@ -40,6 +40,11 @@ namespace ContaCorrente.Api.Application.Queries.Login
                 throw new UnauthorizedUserException("Usuário não encontrado.");
             }
 
+            if (!user.Ativo)
+            {
+                throw new UnauthorizedUserException("Esta conta corrente está inativa.");
+            }
+
             var senhaHash = HashPassword(request.Senha, user.Salt);
 
             // Valida a senha com o registro no banco de dados

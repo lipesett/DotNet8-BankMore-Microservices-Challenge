@@ -1,9 +1,12 @@
 ﻿using ContaCorrente.Api.Application.Commands.CreateContaCorrente;
+using ContaCorrente.Api.Application.Commands.InativarConta;
 using ContaCorrente.Api.Application.DTOs;
 using ContaCorrente.Api.Application.Exceptions;
 using ContaCorrente.Api.Application.Queries.Login;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ContaCorrente.Api.Controllers
 {
@@ -77,6 +80,28 @@ namespace ContaCorrente.Api.Controllers
                 };
                 return Unauthorized(errorResponse);
             }
+        }
+
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> Inativar([FromBody] InativarContaRequestDto request)
+        {
+            var idContaCorrente = User.FindFirstValue("idcontacorrente");
+
+            if (string.IsNullOrEmpty(idContaCorrente))
+            {
+                return Unauthorized();
+            }
+
+            var command = new InativarContaCommand
+            {
+                IdContaCorrente = idContaCorrente,
+                Senha = request.Senha
+            };
+
+            await _mediator.Send(command);
+
+            return NoContent();
         }
     }
 }
