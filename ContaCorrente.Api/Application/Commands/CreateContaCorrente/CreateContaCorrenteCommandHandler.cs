@@ -34,6 +34,7 @@ namespace ContaCorrente.Api.Application.Commands.CreateContaCorrente
             {
                 Numero = new Random().Next(10000, 99999),
                 Nome = "Titular Padrão", // nome padrão por enquanto
+                Cpf = request.Cpf,
                 Ativo = true,
                 Senha = senhaHash,
                 Salt = salt
@@ -44,8 +45,8 @@ namespace ContaCorrente.Api.Application.Commands.CreateContaCorrente
             connection.Open();
 
             var sql = @"
-                INSERT INTO ContasCorrentes (IdContaCorrente, Numero, Nome, Ativo, Senha, Salt)
-                VALUES (@IdContaCorrente, @Numero, @Nome, @Ativo, @Senha, @Salt);";
+                INSERT INTO ContasCorrentes (IdContaCorrente, Numero, Nome, Cpf, Ativo, Senha, Salt)
+                VALUES (@IdContaCorrente, @Numero, @Nome, @Cpf, @Ativo, @Senha, @Salt)";
 
             await connection.ExecuteAsync(sql, novaConta);
 

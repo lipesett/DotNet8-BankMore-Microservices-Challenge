@@ -31,6 +31,7 @@ namespace ContaCorrente.Api.Migrations
                     IdContaCorrente = table.Column<string>(type: "TEXT", nullable: false),
                     Numero = table.Column<int>(type: "INTEGER", nullable: false),
                     Nome = table.Column<string>(type: "TEXT", nullable: true),
+                    Cpf = table.Column<string>(type: "TEXT", nullable: false),
                     Ativo = table.Column<bool>(type: "INTEGER", nullable: false),
                     Senha = table.Column<string>(type: "TEXT", nullable: true),
                     Salt = table.Column<string>(type: "TEXT", nullable: true)

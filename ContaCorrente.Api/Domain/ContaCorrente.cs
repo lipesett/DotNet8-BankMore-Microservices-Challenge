@@ -8,6 +8,7 @@ namespace ContaCorrente.Api.Domain
         public string IdContaCorrente { get; set; } = Guid.NewGuid().ToString();
         public int Numero { get; set; }
         public string? Nome { get; set; }
+        public string Cpf { get; set; }
         public bool Ativo { get; set; }
         public string? Senha { get; set; }
         public string? Salt { get; set; }

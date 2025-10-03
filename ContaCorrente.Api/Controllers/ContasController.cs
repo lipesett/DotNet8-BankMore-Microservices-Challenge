@@ -1,5 +1,7 @@
 ﻿using ContaCorrente.Api.Application.Commands.CreateContaCorrente;
 using ContaCorrente.Api.Application.DTOs;
+using ContaCorrente.Api.Application.Exceptions;
+using ContaCorrente.Api.Application.Queries.Login;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,6 +49,33 @@ namespace ContaCorrente.Api.Controllers
                 }
                 // Se for outra ArgumentException, retorna um erro genérico.
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+        {
+            try
+            {
+                var query = new LoginQuery
+                {
+                    NumeroConta = request.NumeroConta,
+                    Cpf = request.Cpf,
+                    Senha = request.Senha
+                };
+
+                var response = await _mediator.Send(query);
+
+                return Ok(response);
+            }
+            catch (UnauthorizedUserException ex)
+            {
+                var errorResponse = new ErrorResponse
+                {
+                    Mensagem = ex.Message,
+                    TipoFalha = "USER_UNAUTHORIZED"
+                };
+                return Unauthorized(errorResponse);
             }
         }
     }
