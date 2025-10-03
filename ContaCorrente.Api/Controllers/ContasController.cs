@@ -3,6 +3,7 @@ using ContaCorrente.Api.Application.Commands.InativarConta;
 using ContaCorrente.Api.Application.Commands.Movimentacao;
 using ContaCorrente.Api.Application.DTOs;
 using ContaCorrente.Api.Application.Exceptions;
+using ContaCorrente.Api.Application.Queries.GetSaldo;
 using ContaCorrente.Api.Application.Queries.Login;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -41,7 +42,6 @@ namespace ContaCorrente.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                // Captura a exceção no Handler para CPF inválido.
                 if (ex.Message.Contains("CPF inválido"))
                 {
                     var errorResponse = new ErrorResponse
@@ -51,7 +51,6 @@ namespace ContaCorrente.Api.Controllers
                     };
                     return BadRequest(errorResponse);
                 }
-                // Se for outra ArgumentException, retorna um erro genérico.
                 return BadRequest(ex.Message);
             }
         }
@@ -106,7 +105,7 @@ namespace ContaCorrente.Api.Controllers
         }
 
         [HttpPost("movimentacao")]
-        [Authorize] // Este endpoint requer um token de autenticação
+        [Authorize]
         public async Task<IActionResult> Movimentacao([FromBody] MovimentacaoRequestDto request)
         {
             try
@@ -120,14 +119,14 @@ namespace ContaCorrente.Api.Controllers
                 var command = new MovimentacaoCommand
                 {
                     IdRequisicao = request.IdRequisicao,
-                    IdContaCorrente = idContaCorrente, // Usa o ID do token
+                    IdContaCorrente = idContaCorrente,
                     Valor = request.Valor,
                     TipoMovimento = request.TipoMovimento
                 };
 
                 await _mediator.Send(command);
 
-                return NoContent(); // Retorna HTTP 204 em caso de sucesso
+                return NoContent();
             }
             catch (BusinessRuleViolationException ex)
             {
@@ -136,7 +135,36 @@ namespace ContaCorrente.Api.Controllers
                     Mensagem = ex.Message,
                     TipoFalha = ex.FailureType
                 };
-                return BadRequest(errorResponse); // Retorna HTTP 400 para violações de regras de negócio
+                return BadRequest(errorResponse);
+            }
+        }
+
+        [HttpGet("saldo")]
+        [Authorize]
+        public async Task<IActionResult> GetSaldo()
+        {
+            try
+            {
+                var idContaCorrente = User.FindFirstValue("idcontacorrente");
+                if (string.IsNullOrEmpty(idContaCorrente))
+                {
+                    return Unauthorized();
+                }
+
+                var query = new GetSaldoQuery { IdContaCorrente = idContaCorrente };
+
+                var result = await _mediator.Send(query);
+
+                return Ok(result);
+            }
+            catch (BusinessRuleViolationException ex)
+            {
+                var errorResponse = new ErrorResponse
+                {
+                    Mensagem = ex.Message,
+                    TipoFalha = ex.FailureType
+                };
+                return BadRequest(errorResponse);
             }
         }
     }
