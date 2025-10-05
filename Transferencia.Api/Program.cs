@@ -14,6 +14,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddHttpClient("ContaCorrenteClient", client =>
+{
+    var serviceUrl = builder.Configuration["ServiceUrls:ContaCorrenteApi"];
+    if (string.IsNullOrEmpty(serviceUrl))
+    {
+        throw new InvalidOperationException("URL da ContaCorrenteApi não está configurada.");
+    }
+    client.BaseAddress = new Uri(serviceUrl);
+});
 
 var app = builder.Build();
 
