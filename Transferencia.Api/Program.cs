@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Transferencia.Api.Infrastructure;
+using Transferencia.Api.Application.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient("ContaCorrenteClient", client =>
 {
     var serviceUrl = builder.Configuration["ServiceUrls:ContaCorrenteApi"];

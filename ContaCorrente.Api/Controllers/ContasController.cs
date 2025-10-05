@@ -3,6 +3,7 @@ using ContaCorrente.Api.Application.Commands.InativarConta;
 using ContaCorrente.Api.Application.Commands.Movimentacao;
 using ContaCorrente.Api.Application.DTOs;
 using ContaCorrente.Api.Application.Exceptions;
+using ContaCorrente.Api.Application.Queries.GetContaPorNumero;
 using ContaCorrente.Api.Application.Queries.GetSaldo;
 using ContaCorrente.Api.Application.Queries.Login;
 using MediatR;
@@ -167,6 +168,15 @@ namespace ContaCorrente.Api.Controllers
                 };
                 return BadRequest(errorResponse);
             }
+        }
+
+        [HttpGet("por-numero/{numeroConta}")]
+        [Authorize]
+        public async Task<IActionResult> GetByNumero(int numeroConta)
+        {
+            var query = new GetContaPorNumeroQuery { NumeroConta = numeroConta };
+            var result = await _mediator.Send(query);
+            return result != null ? Ok(result) : NotFound();
         }
     }
 }
