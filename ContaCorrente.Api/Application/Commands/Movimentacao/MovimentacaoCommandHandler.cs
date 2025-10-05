@@ -25,35 +25,47 @@ namespace ContaCorrente.Api.Application.Commands.Movimentacao
 
             try
             {
-                // 1. Verificação de Idempotência Robusta
                 var idempotencyCheckSql = "SELECT Requisicao FROM ChavesIdempotencia WHERE IdChaveIdempotencia = @IdRequisicao";
                 var savedRequestJson = await connection.QueryFirstOrDefaultAsync<string>(idempotencyCheckSql, new { request.IdRequisicao }, transaction);
 
                 if (savedRequestJson != null)
                 {
-                    // Define um tipo anônimo para representar a estrutura da requisição
-                    var requestShape = new { request.IdContaCorrente, request.Valor, request.TipoMovimento };
-                    var currentRequestJson = JsonSerializer.Serialize(requestShape);
+                    var requestDataToCompare = new { IdContaCorrente = request.IdContaCorrente, Valor = request.Valor, TipoMovimento = request.TipoMovimento, NumeroConta = request.NumeroConta };
+                    var currentRequestJson = JsonSerializer.Serialize(requestDataToCompare);
 
-                    // Compara os objetos em vez das strings brutas
                     if (savedRequestJson == currentRequestJson)
                     {
-                        // É uma repetição válida e idêntica. Retorna sucesso.
                         transaction.Commit();
                         return;
                     }
                     else
                     {
-                        // A chave está sendo reutilizada com um corpo diferente. Isso é um erro.
                         throw new BusinessRuleViolationException("Chave de idempotência está sendo reutilizada com uma requisição diferente.", "IDEMPOTENCY_ERROR");
                     }
                 }
 
-                // 2. Validações de Negócio (AGORA EXECUTADAS APENAS PARA NOVAS REQUISIÇÕES)
-                var conta = await connection.QueryFirstOrDefaultAsync<ContaCorrenteEntity>(
-                    "SELECT * FROM ContasCorrentes WHERE IdContaCorrente = @IdContaCorrente",
-                    new { request.IdContaCorrente },
-                    transaction);
+                string idContaAlvo;
+                ContaCorrenteEntity conta;
+
+                if (request.NumeroConta.HasValue)
+                {
+                    conta = await connection.QueryFirstOrDefaultAsync<ContaCorrenteEntity>(
+                        "SELECT * FROM ContasCorrentes WHERE Numero = @NumeroConta",
+                        new { request.NumeroConta },
+                        transaction);
+
+                    if (conta == null)
+                        throw new BusinessRuleViolationException("A conta de destino informada não existe.", "INVALID_ACCOUNT");
+                }
+                else
+                {
+                    conta = await connection.QueryFirstOrDefaultAsync<ContaCorrenteEntity>(
+                        "SELECT * FROM ContasCorrentes WHERE IdContaCorrente = @IdContaCorrente",
+                        new { request.IdContaCorrente },
+                        transaction);
+                }
+
+                idContaAlvo = conta.IdContaCorrente;
 
                 if (conta == null)
                     throw new BusinessRuleViolationException("Apenas contas correntes cadastradas podem receber movimentação.", "INVALID_ACCOUNT");
@@ -70,19 +82,20 @@ namespace ContaCorrente.Api.Application.Commands.Movimentacao
 
                 var movimento = new Movimento
                 {
-                    IdContaCorrente = request.IdContaCorrente,
+                    IdContaCorrente = idContaAlvo,
                     DataMovimento = DateTime.UtcNow,
                     TipoMovimento = tipo,
                     Valor = request.Valor
                 };
+
                 var sqlMovimento = @"INSERT INTO Movimentos (IdMovimento, IdContaCorrente, DataMovimento, TipoMovimento, Valor)
-                                     VALUES (@IdMovimento, @IdContaCorrente, @DataMovimento, @TipoMovimento, @Valor);";
+                                     VALUES (@IdMovimento, @IdContaCorrente, @DataMovimento, @TipoMovimento, @Valor)";
                 await connection.ExecuteAsync(sqlMovimento, movimento, transaction);
 
-                var newRequestJson = JsonSerializer.Serialize(new { request.IdContaCorrente, request.Valor, request.TipoMovimento });
+                var requestJsonToSave = JsonSerializer.Serialize(new { IdContaCorrente = request.IdContaCorrente, Valor = request.Valor, TipoMovimento = request.TipoMovimento, NumeroConta = request.NumeroConta });
                 var sqlIdempotency = @"INSERT INTO ChavesIdempotencia (IdChaveIdempotencia, Requisicao)
-                                       VALUES (@IdRequisicao, @RequestJson);";
-                await connection.ExecuteAsync(sqlIdempotency, new { request.IdRequisicao, RequestJson = newRequestJson }, transaction);
+                                       VALUES (@IdRequisicao, @RequestJson)";
+                await connection.ExecuteAsync(sqlIdempotency, new { request.IdRequisicao, RequestJson = requestJsonToSave }, transaction);
 
                 transaction.Commit();
             }

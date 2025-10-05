@@ -12,5 +12,7 @@ namespace ContaCorrente.Api.Application.DTOs
 
         [Required]
         public char TipoMovimento { get; set; } // 'C' para Crédito, 'D' para Débito
+
+        public int? NumeroConta { get; set; }
     }
 }

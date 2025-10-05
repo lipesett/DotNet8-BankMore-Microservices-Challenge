@@ -121,7 +121,8 @@ namespace ContaCorrente.Api.Controllers
                     IdRequisicao = request.IdRequisicao,
                     IdContaCorrente = idContaCorrente,
                     Valor = request.Valor,
-                    TipoMovimento = request.TipoMovimento
+                    TipoMovimento = request.TipoMovimento,
+                    NumeroConta = request.NumeroConta,
                 };
 
                 await _mediator.Send(command);
