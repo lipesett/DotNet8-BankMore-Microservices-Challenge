@@ -49,13 +49,13 @@ Esta é uma solução com múltiplos projetos. Você deve executar as duas APIs 
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/.Net8-BankMore-Microservices-Portfolio.git](https://github.com/SEU-USUARIO/.Net8-BankMore-Microservices-Portfolio.git)
+    git clone [https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git](https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git)
     ```
     (Lembre-se de substituir `SEU-USUARIO` pelo seu nome de usuário do GitHub)
 
 2.  **Navegue até a pasta da solução:**
     ```bash
-    cd .Net8-BankMore-Microservices-Portfolio
+    cd DotNet8-BankMore-Microservices-Challenge
     ```
 
 3.  **Prepare os Bancos de Dados (Apenas na primeira vez):**
@@ -152,13 +152,13 @@ This is a multi-project solution. You must run both APIs simultaneously.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/.Net8-BankMore-Microservices-Portfolio.git](https://github.com/SEU-USUARIO/.Net8-BankMore-Microservices-Portfolio.git)
+    git clone [https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git](https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git)
     ```
     (Remember to replace `SEU-USUARIO` with your GitHub username)
 
 2.  **Navigate to the solution folder:**
     ```bash
-    cd .Net8-BankMore-Microservices-Portfolio
+    cd DotNet8-BankMore-Microservices-Challenge
     ```
 
 3.  **Prepare the Databases (First time only):**
