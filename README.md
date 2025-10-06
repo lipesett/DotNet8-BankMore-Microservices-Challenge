@@ -49,7 +49,7 @@ Esta é uma solução com múltiplos projetos. Você deve executar as duas APIs 
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git](https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git)
+    git clone https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git
     ```
     (Lembre-se de substituir `SEU-USUARIO` pelo seu nome de usuário do GitHub)
 
@@ -152,7 +152,7 @@ This is a multi-project solution. You must run both APIs simultaneously.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git](https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git)
+    git clone https://github.com/SEU-USUARIO/DotNet8-BankMore-Microservices-Challenge.git
     ```
     (Remember to replace `SEU-USUARIO` with your GitHub username)
 
